@@ -12,6 +12,8 @@ Created on Fri Mar  8 20:29:42 2019
 @author: bhaik
 """
 
+#using Pytesseract for predictions
+
 import cv2
 import imutils
 import numpy as np
@@ -21,8 +23,8 @@ from PIL import Image
 import time
 from docx import Document
 
-pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract'
-#f = open('new.docx', 'rb')
+pytesseract.pytesseract.tesseract_cmd = 'Path_to_saved_model/Tesseract-OCR/tesseract'
+
 document = Document()
 
 def order_points(pts):
@@ -90,9 +92,8 @@ def four_point_transform(image, pts):
 
 
 cap = cv2.VideoCapture(0)
-#count = 0
 
-image_path = "C:\\Users\\bhaik\\OneDrive\\Desktop\\Vibhav_projects\\saved_image\\123.jpg"
+image_path = "Path_to_the_image\\123.jpg"
 
 
 while True:
@@ -102,7 +103,7 @@ while True:
     ret, frame = cap.read()
     ratio = frame.shape[0]/500.0
     orig = frame.copy()
-    #orig = cv2.resize(orig, None, fx=0.5, fy=0.5, interpolation = cv2.INTER_CUBIC)
+ 
     frame = imutils.resize(frame, height = 500)
     frame = cv2.bilateralFilter(frame,10,10,6)
     
@@ -114,15 +115,15 @@ while True:
     # finding the contours
     
     _, cnts, _ = cv2.findContours(edged, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    # _, cnts = imutils.grab_contours(cnts)
+    
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:5]
     
     # loop over the contour
     for c in cnts:
-        #count = count+1
+        
         count=0
         count = count + 1
-        # area = cv2.contourArea(cnts)
+        
         peri = cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, 0.02*peri, True)
         
@@ -138,7 +139,6 @@ while True:
             T = threshold_local(wrapped, 11, offset = 10, method = "gaussian")
             wrapped = (wrapped > T).astype("uint8")*255
             
-            #cv2.imshow("original", imutils.resize(orig, height = 650))
             cv2.imshow("scanned", imutils.resize(wrapped, height = 650))
             #time.sleep(1)
             #if count == 10000:
@@ -146,7 +146,6 @@ while True:
             #    break
     
     cv2.imshow("frame", frame)
-    #cv2.imshow("Edged", edged)
     
     key = cv2.waitKey(1)
     if key == 27:
@@ -168,26 +167,20 @@ def get_string(img_path):
     # filtering the image
     
     img = cv2.bilateralFilter(img,10,10,6)
-    
-    #ret,img = cv2.threshold(img,127,255,cv2.THRESH_BINARY)
-    #img = cv2.threshold(img, 0, 255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    #img = cv2.medianBlur(img, 3)
 
     # Apply dilation and erosion to remove some noise
     kernel = np.ones((1, 1), np.uint8)
     img = cv2.dilate(img, kernel, iterations=1)
     img = cv2.erode(img, kernel, iterations=1)
-    # img = cv2.resize(img,(100,100), interpolation = cv2.INTER_AREA)
 
     # Write image after removed noise
     cv2.imwrite("removed_noise.png", img)
 
     #  Apply threshold to get image with only black and white
-    # img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
 
     # Write the image after apply opencv to do some ...
     cv2.imwrite(img_path, img)
-     # Recognize text with tesseract for python
+    # Recognize text with tesseract for python
     result = pytesseract.image_to_string(Image.open(img_path))
     # Remove template file
     #os.remove(temp)
@@ -204,6 +197,5 @@ print ('--- Start recognize text from image ---')
 print (get_string(filename))
 
 paragraph = document.add_paragraph(get_string(filename))
-#document = Document('new.docx')
 document.save('new-file-name.docx')
 print ("------ Done -------")
