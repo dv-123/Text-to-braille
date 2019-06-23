@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 10 00:01:28 2019
-
-@author: bhaik
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Fri Mar  8 20:29:42 2019
 
 @author: bhaik
