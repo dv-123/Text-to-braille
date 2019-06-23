@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 10 00:01:28 2019
-
-@author: bhaik
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Fri Mar  8 20:29:42 2019
 
 @author: bhaik
 """
+
+# Using pytesseract and predesigned algorithms. 
 
 import cv2
 import imutils
@@ -24,8 +19,8 @@ import serial
 
 Arduinouno_Serial = serial.Serial('COM21',9600)
 print (Arduinouno_Serial.readline())
-pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract'
-#f = open('new.docx', 'rb')
+pytesseract.pytesseract.tesseract_cmd = 'Path_to_saved_model/Tesseract-OCR/tesseract'
+
 document = Document()
 
 def order_points(pts):
@@ -93,7 +88,6 @@ def four_point_transform(image, pts):
 
 
 cap = cv2.VideoCapture(0)
-#count = 0
 
 image_path = "C:\\Users\\bhaik\\OneDrive\\Desktop\\Vibhav_projects\\saved_image\\123.jpg"
 
@@ -105,7 +99,7 @@ while True:
     ret, frame = cap.read()
     ratio = frame.shape[0]/500.0
     orig = frame.copy()
-    #orig = cv2.resize(orig, None, fx=0.5, fy=0.5, interpolation = cv2.INTER_CUBIC)
+    
     frame = imutils.resize(frame, height = 500)
     frame = cv2.bilateralFilter(frame,10,10,6)
     
@@ -117,15 +111,15 @@ while True:
     # finding the contours
     
     _, cnts, _ = cv2.findContours(edged, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    # _, cnts = imutils.grab_contours(cnts)
+    
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:5]
     
     # loop over the contour
     for c in cnts:
-        #count = count+1
+        
         count=0
         count = count + 1
-        # area = cv2.contourArea(cnts)
+        
         peri = cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, 0.02*peri, True)
         
@@ -141,7 +135,7 @@ while True:
             T = threshold_local(wrapped, 11, offset = 10, method = "gaussian")
             wrapped = (wrapped > T).astype("uint8")*255
             
-            #cv2.imshow("original", imutils.resize(orig, height = 650))
+            
             cv2.imshow("scanned", imutils.resize(wrapped, height = 650))
             #time.sleep(1)
             #if count == 10000:
@@ -180,7 +174,6 @@ def get_string(img_path):
     kernel = np.ones((1, 1), np.uint8)
     img = cv2.dilate(img, kernel, iterations=1)
     img = cv2.erode(img, kernel, iterations=1)
-    # img = cv2.resize(img,(100,100), interpolation = cv2.INTER_AREA)
 
     # Write image after removed noise
     cv2.imwrite("removed_noise.png", img)
@@ -190,7 +183,7 @@ def get_string(img_path):
 
     # Write the image after apply opencv to do some ...
     cv2.imwrite(img_path, img)
-     # Recognize text with tesseract for python
+    # Recognize text with tesseract for python
     result = pytesseract.image_to_string(Image.open(img_path))
     # Remove template file
     #os.remove(temp)
