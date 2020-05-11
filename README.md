@@ -15,3 +15,6 @@ And then the string of alphabets will be sent to the arduino through sirial comm
 
 Now, we have previously coded Arduino and which will move the servo-motors according to the brail system(6 pointed brail system only).
 No, special characters are included in the brail code yet, but the arduino code will be enhanced in future.
+
+Example output image after processing from the camera input and before sending to the model for prediction:
+![](output/OCR-op.PNG)
